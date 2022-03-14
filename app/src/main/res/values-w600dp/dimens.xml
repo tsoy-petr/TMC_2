@@ -1,0 +1,4 @@
+<resources>
+    <dimen name="medium_space">12dp</dimen>
+    <dimen name="large_space">30dp</dimen>
+</resources>

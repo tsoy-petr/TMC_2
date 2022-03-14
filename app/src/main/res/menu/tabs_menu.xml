@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@id/scanning_tmc_graph"
+        android:icon="@drawable/qr_code_24"
+        android:title="@string/title_scanning_tmc" />
+    <item
+        android:id="@id/settings_graph"
+        android:icon="@drawable/settings_24"
+        android:title="@string/title_settings" />
+</menu>

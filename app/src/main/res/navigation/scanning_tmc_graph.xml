@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scanning_tmc_graph"
+    app:startDestination="@id/scanningTMCFragment">
+
+    <fragment
+        android:id="@+id/scanningTMCFragment"
+        android:name="com.hootor.tmc_2.screens.main.scanning.tmc.ScanningTMCFragment"
+        android:label="ScanningTMCFragment"
+        tools:layout="@layout/fragment_scanning_qr">
+        <action
+            android:id="@+id/action_scanningTMCFragment_to_scanningQRFragment"
+            app:destination="@id/scanningQRFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/scanningQRFragment"
+        android:name="com.hootor.tmc_2.screens.main.scanning.qr.ScanningQRFragment"
+        android:label="ScanningQRFragment" />
+</navigation>

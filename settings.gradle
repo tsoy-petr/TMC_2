@@ -1,0 +1,3 @@
+
+rootProject.name = "TMC_2"
+include ':app'

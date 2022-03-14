@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">TMC_2</string>
+    <string name="title_activity_splash">SplashActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="please_wait">Please wait…</string>
+    <string name="text_title_settings">Для работы приложения необходимо установить настройки!</string>
+    <string name="text_title_save_button">Сохранить</string>
+    <string name="title_address_server">Адрес сервера</string>
+    <string name="title_server_port">Порт сервера</string>
+    <string name="title_user_name">Имя пользователя</string>
+    <string name="title_user_pass">Пароль пользователя</string>
+    <string name="title_scanning_tmc">Сканирование ТМЦ</string>
+    <string name="title_settings">Настройки</string>
+    <string name="click_to_start_scanning_fragment">Click to start scanning fragment</string>
+
+    <string name="permission_denied">Permission denied</string>
+    <string name="permission_denied_forever_message">"You have denied permissions forever. You can change your decision in the app settings.\n\nWould you like to open app settings?"</string>
+    <string name="open">Open</string>
+    <string name="camera_permission_granted">Camera permission has been granted</string>
+    <string name="permissions_denied_forever">Permissions are denied forever</string>
+    <string name="reload_again">Повторить</string>
+
+</resources>

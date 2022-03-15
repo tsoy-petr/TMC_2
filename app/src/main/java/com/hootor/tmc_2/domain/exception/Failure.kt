@@ -21,7 +21,11 @@ package com.hootor.tmc_2.domain.exception
  */
 sealed class Failure {
     object NetworkConnection : Failure()
-    object ServerError : Failure()
+    object ServerError : Failure(){
+        override fun toString(): String {
+            return "Ошибка сервера"
+        }
+    }
 
     /** * Extend this class for feature specific failures.*/
     abstract class FeatureFailure : Failure()

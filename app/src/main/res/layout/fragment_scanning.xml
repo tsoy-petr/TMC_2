@@ -6,27 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".screens.main.scanning.tmc.ScanningTMCFragment">
 
-    <com.smarteist.autoimageslider.SliderView
-        android:id="@+id/imageSlider"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        app:layout_constraintBottom_toTopOf="@id/itemsFieldsList"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:sliderAnimationDuration="600"
-        app:sliderAutoCycleDirection="back_and_forth"
-        app:sliderIndicatorAnimationDuration="600"
-        app:sliderIndicatorEnabled="true"
-        app:sliderIndicatorGravity="center_horizontal|bottom"
-        app:sliderIndicatorMargin="15dp"
-        app:sliderIndicatorOrientation="horizontal"
-        app:sliderIndicatorPadding="3dp"
-        app:sliderIndicatorRadius="2dp"
-        app:sliderIndicatorSelectedColor="#5A5A5A"
-        app:sliderIndicatorUnselectedColor="#FFF"
-        app:sliderScrollTimeInSec="1" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/itemsFieldsList"
         android:layout_width="match_parent"
@@ -34,7 +13,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageSlider"
+        app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/item_tmc_field" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -77,7 +56,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
         android:visibility="gone"
-        tools:text="ERROR" />
+        android:textAlignment="gravity"
+        tools:text="ERRORscscscscsc" />
 
     <Button
         android:id="@+id/buttonReload"
@@ -94,7 +74,7 @@
         android:id="@+id/groupDataList"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="itemsFieldsList,imageSlider" />
+        app:constraint_referenced_ids="itemsFieldsList" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/groupError"

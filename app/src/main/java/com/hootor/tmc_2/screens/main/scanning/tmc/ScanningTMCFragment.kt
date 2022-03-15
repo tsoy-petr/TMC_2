@@ -4,10 +4,10 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -33,10 +34,17 @@ import com.hootor.tmc_2.data.Prefs
 import com.hootor.tmc_2.databinding.FragmentScanningBinding
 import com.hootor.tmc_2.di.ViewModelFactory
 import com.hootor.tmc_2.screens.main.scanning.qr.ScanningViewModel
+import com.hootor.tmc_2.screens.main.scanning.tmc.adapter.*
+import com.hootor.tmc_2.screens.main.scanning.tmc.adapter.decorations.FeedHorizontalDividerItemDecoration
+import com.hootor.tmc_2.screens.main.scanning.tmc.adapter.decorations.GroupVerticalItemDecoration
+import com.hootor.tmc_2.screens.main.scanning.tmc.holders.FieldTMCDescription
+import com.hootor.tmc_2.screens.main.scanning.tmc.holders.HorizontalImgTMC
+import com.hootor.tmc_2.screens.main.scanning.tmc.holders.HorizontalItem
+import com.hootor.tmc_2.screens.main.scanning.tmc.holders.TMCItem
 import com.hootor.tmc_2.screens.view.bottomEndParentConstraint
+import com.hootor.tmc_2.screens.view.getMarginBottom
 import com.hootor.tmc_2.screens.view.matchParentConstraint
 import com.hootor.tmc_2.utils.observeEvent
-import com.smarteist.autoimageslider.SliderView
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -47,8 +55,21 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
     private var isAnimatingOut = false
 
     private lateinit var binding: FragmentScanningBinding
-    private lateinit var adapter: TMCFieldsAdapter
-    private lateinit var adapterImg: SliderAdapterTMC
+
+    private val descriptionFieldAdapter =
+        FieldsTMCAdapter(listOf(FieldTMCBoolean(), FieldTMCDescription()))
+    private lateinit var imgFieldAdapter: FieldsTMCAdapter
+
+    private val concatAdapter by lazy {
+        Log.i("happy", "concatAdapter")
+        ConcatAdapter(
+            ConcatAdapter.Config.Builder()
+                .setIsolateViewTypes(false)
+                .build(),
+            imgFieldAdapter,
+            descriptionFieldAdapter
+        )
+    }
 
     @Inject
     lateinit var prefs: Prefs
@@ -68,6 +89,13 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
         ::onGotCameraPermissionResult
     )
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        imgFieldAdapter = FieldsTMCAdapter(listOf(HorizontalImgTMC(prefs)))
+
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -81,7 +109,7 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
             viewModelFactory)[ScanningViewModel::class.java]
 
         lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.fState.collect {
                     handleEvent(it)
                 }
@@ -92,17 +120,22 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
             viewModel.fetchData(qrCode)
         }
 
-        initImgAdapter()
-        initAdapter()
+        initNewAdapter()
 
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         binding.floatingActionButtonToStartScanning.setOnClickListener {
             requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
+
+        binding.buttonReload.setOnClickListener {
+            viewModel.reload()
+        }
+
     }
 
     override fun onAttach(context: Context) {
@@ -110,49 +143,24 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
         super.onAttach(context)
     }
 
-    private fun initImgAdapter() {
-        adapterImg = SliderAdapterTMC(prefs)
-        binding.imageSlider.setSliderAdapter(adapterImg)
+    private fun initNewAdapter() {
+        with(binding.itemsFieldsList) {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = concatAdapter
 
-        binding.imageSlider.autoCycleDirection = SliderView.AUTO_CYCLE_DIRECTION_BACK_AND_FORTH
-        binding.imageSlider.indicatorSelectedColor = Color.WHITE
-        binding.imageSlider.indicatorUnselectedColor = Color.GRAY
-        binding.imageSlider.scrollTimeInSec = 30
+            addItemDecoration(GroupVerticalItemDecoration(R.layout.item_tmc_field, 75, 45))
 
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.currImgListPosition.collect { position ->
-                    binding.imageSlider.currentPagePosition = position
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    if (dy > 0 && binding.floatingActionButtonToStartScanning.visibility == View.VISIBLE) {
+                        animateOut(binding.floatingActionButtonToStartScanning)
+                    } else if (dy < 0 && binding.floatingActionButtonToStartScanning.visibility != View.VISIBLE) {
+                        animateIn(binding.floatingActionButtonToStartScanning)
+                    }
                 }
-            }
+            })
         }
-
-        binding.imageSlider.setOnIndicatorClickListener { position ->
-            binding.imageSlider.currentPagePosition = position
-        }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        viewModel.setCurrImgListPosition(binding.imageSlider.currentPagePosition)
-        super.onSaveInstanceState(outState)
-    }
-
-    private fun initAdapter() {
-        adapter = TMCFieldsAdapter()
-        val layoutManager = LinearLayoutManager(requireContext())
-        binding.itemsFieldsList.layoutManager = layoutManager
-        binding.itemsFieldsList.adapter = adapter
-
-        binding.itemsFieldsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (dy > 0 && binding.floatingActionButtonToStartScanning.visibility == View.VISIBLE) {
-                    animateOut(binding.floatingActionButtonToStartScanning)
-                } else if (dy < 0 && binding.floatingActionButtonToStartScanning.visibility != View.VISIBLE) {
-                    animateIn(binding.floatingActionButtonToStartScanning)
-                }
-            }
-        })
     }
 
     private fun handleEvent(event: ViewState) {
@@ -191,16 +199,20 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
     }
 
     private fun showSuccess(event: ViewState) {
-        adapterImg.items = event.imgs
-        adapter.items = event.items
+
+        imgFieldAdapter.submitList(
+            event.items.filterIsInstance<HorizontalItem>().toList()
+        )
+
+        descriptionFieldAdapter.submitList(
+            event.items.filter { it is TMCItemBoolean || it is TMCItem }
+        )
 
         binding.groupDataList.isVisible = true
 
         binding.floatingActionButtonToStartScanning.isVisible = true
         binding.floatingActionButtonToStartScanning.bottomEndParentConstraint()
         binding.progressBar.isVisible = false
-
-        binding.imageSlider.isVisible = event.imgs.isNotEmpty()
 
         setupError(false)
     }
@@ -233,7 +245,7 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
     }
 
     private fun animateOut(button: FloatingActionButton) {
-        ViewCompat.animate(button).translationY((button.height + getMarginBottom(button)).toFloat())
+        ViewCompat.animate(button).translationY((button.height + button.getMarginBottom()).toFloat())
             .setInterpolator(inInterpolator).withLayer()
             .setListener(object : ViewPropertyAnimatorListener {
                 override fun onAnimationStart(view: View) {
@@ -257,13 +269,6 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
             .setInterpolator(inInterpolator).withLayer()
             .setListener(null)
             .start()
-    }
-
-    private fun getMarginBottom(v: View): Int {
-        var marginBottom = 0
-        val layoutParams = v.layoutParams
-        if (layoutParams is ViewGroup.MarginLayoutParams) marginBottom = layoutParams.bottomMargin
-        return marginBottom
     }
 
     private fun onGotCameraPermissionResult(granted: Boolean) {

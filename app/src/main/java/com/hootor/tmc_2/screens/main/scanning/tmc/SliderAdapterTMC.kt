@@ -1,5 +1,6 @@
 package com.hootor.tmc_2.screens.main.scanning.tmc
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
@@ -32,6 +33,8 @@ class SliderAdapterTMC(private val prefs: Prefs) : SliderViewAdapter<SliderAdapt
     override fun onBindViewHolder(holder: SliderAdapterVH, position: Int) {
         val itemField = items[position]
         holder.itemView.tag = itemField
+
+        Log.i("happy", "SliderAdapterTMC.onBindViewHolder")
 
         val auth = LazyHeaders.Builder()
             .addHeader("Authorization", prefs.getCredentials()).build()

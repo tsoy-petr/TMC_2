@@ -1,4 +1,4 @@
-package com.hootor.tmc_2.screens.main.scanning.tmc.adapter
+package com.hootor.tmc_2.screens.main.scanning.tmc.holders
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -37,7 +37,7 @@ class FieldTMCDescriptionViewHolder(binding: ItemTmcFieldBinding) : BaseViewHold
     override fun onBind(item: TMCItem) {
         super.onBind(item)
         with(binding){
-            titleTmcTextView.text = item.description
+            titleTmcTextView.text = item.title
             descriptionTmcTextView.text = item.description
         }
     }

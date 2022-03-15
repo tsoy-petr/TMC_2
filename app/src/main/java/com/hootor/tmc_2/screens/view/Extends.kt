@@ -2,6 +2,7 @@ package com.hootor.tmc_2.screens.view
 
 import android.content.res.Resources
 import android.view.View
+import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -23,6 +24,13 @@ fun FloatingActionButton.bottomEndParentConstraint() {
         bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
         endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
     }
+}
+
+fun View.getMarginBottom(): Int {
+    var marginBottom = 0
+    val mlayoutParams = this.layoutParams
+    if (mlayoutParams is ViewGroup.MarginLayoutParams) marginBottom = mlayoutParams.bottomMargin
+    return marginBottom
 }
 
 private fun View.isVisible(bool: Boolean?, nonVisibleState: Int = View.GONE) {

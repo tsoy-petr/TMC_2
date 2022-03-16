@@ -5,6 +5,7 @@ import com.hootor.tmc_2.screens.main.MainViewModel
 import com.hootor.tmc_2.screens.main.scanning.tmc.ScanningTMCViewModel
 import com.hootor.tmc_2.screens.main.scanning.qr.ScanningViewModel
 import com.hootor.tmc_2.screens.main.settings.SettingsViewModel
+import com.hootor.tmc_2.screens.main.tmcTree.TMCTreeViewModel
 import com.hootor.tmc_2.screens.splash.SplashViewModel
 import dagger.Binds
 import dagger.Module
@@ -38,4 +39,8 @@ interface ViewModelModule {
     @ViewModelKey(ScanningViewModel::class)
     fun bindScanningViewModel(viewModel: ScanningViewModel): ViewModel
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(TMCTreeViewModel::class)
+    fun bindTMCTreeViewModel(viewModel: TMCTreeViewModel): ViewModel
 }

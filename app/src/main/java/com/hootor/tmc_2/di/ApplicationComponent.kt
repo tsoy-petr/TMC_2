@@ -5,6 +5,7 @@ import com.hootor.tmc_2.screens.main.MainActivity
 import com.hootor.tmc_2.screens.main.scanning.tmc.ScanningTMCFragment
 import com.hootor.tmc_2.screens.main.scanning.qr.ScanningQRFragment
 import com.hootor.tmc_2.screens.main.settings.SettingsFragment
+import com.hootor.tmc_2.screens.main.tmcTree.TMCTreeFragment
 import com.hootor.tmc_2.screens.splash.SplashFragment
 import dagger.BindsInstance
 import dagger.Component
@@ -23,6 +24,7 @@ interface ApplicationComponent {
     fun inject(fragment: SettingsFragment)
     fun inject(fragment: ScanningTMCFragment)
     fun inject(fragment: ScanningQRFragment)
+    fun inject(fragment: TMCTreeFragment)
 
     fun inject(activity: MainActivity)
 

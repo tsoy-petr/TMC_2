@@ -3,13 +3,16 @@ package com.hootor.tmc_2.screens.main.scanning.tmc.holders
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.hootor.tmc_2.R
 import com.hootor.tmc_2.databinding.ItemTmcFieldBinding
 import com.hootor.tmc_2.screens.main.core.BaseViewHolder
 import com.hootor.tmc_2.screens.main.core.Item
 import com.hootor.tmc_2.screens.main.core.ItemTMC
 
-class FieldTMCDescription : ItemTMC<ItemTmcFieldBinding, TMCItem> {
+class FieldTMCDescription(
+    private val onClick: (TMCItem) -> Unit
+) : ItemTMC<ItemTmcFieldBinding, TMCItem> {
 
     override fun isRelativeItem(item: Item) = item is TMCItem
 
@@ -20,23 +23,32 @@ class FieldTMCDescription : ItemTMC<ItemTmcFieldBinding, TMCItem> {
         parent: ViewGroup,
     ): BaseViewHolder<ItemTmcFieldBinding, TMCItem> {
         val binding = ItemTmcFieldBinding.inflate(layoutInflater, parent, false)
-        return FieldTMCDescriptionViewHolder(binding)
+        return FieldTMCDescriptionViewHolder(onClick, binding)
     }
 
-    override fun getDiffUtil(): DiffUtil.ItemCallback<TMCItem> = object : DiffUtil.ItemCallback<TMCItem>() {
+    override fun getDiffUtil(): DiffUtil.ItemCallback<TMCItem> =
+        object : DiffUtil.ItemCallback<TMCItem>() {
 
-        override fun areItemsTheSame(oldItem: TMCItem, newItem: TMCItem) = oldItem.title == newItem.title
+            override fun areItemsTheSame(oldItem: TMCItem, newItem: TMCItem) =
+                oldItem.title == newItem.title
 
-        override fun areContentsTheSame(oldItem: TMCItem, newItem: TMCItem) = oldItem == newItem
+            override fun areContentsTheSame(oldItem: TMCItem, newItem: TMCItem) = oldItem == newItem
 
-    }
+        }
 }
 
-class FieldTMCDescriptionViewHolder(binding: ItemTmcFieldBinding) : BaseViewHolder<ItemTmcFieldBinding, TMCItem>(binding) {
+class FieldTMCDescriptionViewHolder(onClick: (TMCItem) -> Unit, binding: ItemTmcFieldBinding) :
+    BaseViewHolder<ItemTmcFieldBinding, TMCItem>(binding) {
 
+    init {
+        binding.descriptionTmcTextView.setOnClickListener {
+            if (bindingAdapterPosition == RecyclerView.NO_POSITION) return@setOnClickListener
+            onClick(payl)
+        }
+    }
     override fun onBind(item: TMCItem) {
         super.onBind(item)
-        with(binding){
+        with(binding) {
             titleTmcTextView.text = item.title
             descriptionTmcTextView.text = item.description
         }

@@ -19,10 +19,7 @@ class ScanningRepoImpl @Inject constructor(
     ) {
         it.tmc
     }
-
-    private fun createGetTMCByQrCodeResponseBody(qrCode: String) = GetTMCByQrCodeRequest(qrCode)
-
-        private fun createGetTMCByQrCodeResponseMap(qrCode: String) = HashMap<String, String>().apply {
+    private fun createGetTMCByQrCodeResponseMap(qrCode: String) = HashMap<String, String>().apply {
         put("qrCode", qrCode)
     }
 

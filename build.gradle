@@ -5,7 +5,7 @@ buildscript {
     ext.kotlin_version = "1.6.10"
     ext.nav_version = "2.5.0-alpha03"
     ext.retrofitVersion = "2.9.0"
-    ext.gsonVersion = "2.8.6"
+    ext.gsonVersion = "2.8.7"
     repositories {
         google()
         mavenCentral()
@@ -26,6 +26,7 @@ allprojects {
         google()
         mavenCentral()
         jcenter()
+        maven { url "https://jitpack.io" }
     }
 }
 

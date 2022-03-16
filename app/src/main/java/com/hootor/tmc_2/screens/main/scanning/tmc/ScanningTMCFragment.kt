@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorListener
 import androidx.core.view.isVisible
@@ -44,6 +45,7 @@ import com.hootor.tmc_2.screens.main.scanning.tmc.holders.TMCItem
 import com.hootor.tmc_2.screens.view.bottomEndParentConstraint
 import com.hootor.tmc_2.screens.view.getMarginBottom
 import com.hootor.tmc_2.screens.view.matchParentConstraint
+import com.hootor.tmc_2.utils.findTopNavController
 import com.hootor.tmc_2.utils.observeEvent
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -57,7 +59,7 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
     private lateinit var binding: FragmentScanningBinding
 
     private val descriptionFieldAdapter =
-        FieldsTMCAdapter(listOf(FieldTMCBoolean(), FieldTMCDescription()))
+        FieldsTMCAdapter(listOf(FieldTMCBoolean(), FieldTMCDescription(::onClickTMCItem)))
     private lateinit var imgFieldAdapter: FieldsTMCAdapter
 
     private val concatAdapter by lazy {
@@ -242,6 +244,11 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
     private fun setupError(isShow: Boolean, textError: String? = null) {
         binding.groupError.isVisible = isShow
         binding.textViewError.text = textError
+    }
+
+    private fun onClickTMCItem(item: TMCItem) {
+        findTopNavController().navigate(R.id.action_tabsFragment_to_tmc_tree_graph,
+        bundleOf("qrCode" to item.))
     }
 
     private fun animateOut(button: FloatingActionButton) {

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tmc_tree_graph"
+    app:startDestination="@id/TMCTreeFragment">
+
+    <fragment
+        android:id="@+id/TMCTreeFragment"
+        android:name="com.hootor.tmc_2.screens.main.tmcTree.TMCTreeFragment"
+        android:label="fragment_tmc_tree"
+        tools:layout="@layout/fragment_tmc_tree" >
+        <argument
+            android:name="qrCode"
+            app:argType="string" />
+    </fragment>
+</navigation>

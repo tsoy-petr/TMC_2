@@ -6,6 +6,7 @@ import com.hootor.tmc_2.domain.scanning.ScanningTMCRepository
 import com.hootor.tmc_2.domain.tmc.TMC
 import com.hootor.tmc_2.services.TMCService
 import com.hootor.tmc_2.services.core.Request
+import com.hootor.tmc_2.services.tmc.GetTMCByQrCodeRequest
 import javax.inject.Inject
 
 class ScanningRepoImpl @Inject constructor(
@@ -19,8 +20,9 @@ class ScanningRepoImpl @Inject constructor(
         it.tmc
     }
 
+    private fun createGetTMCByQrCodeResponseBody(qrCode: String) = GetTMCByQrCodeRequest(qrCode)
 
-    private fun createGetTMCByQrCodeResponseMap(qrCode: String) = HashMap<String, String>().apply {
+        private fun createGetTMCByQrCodeResponseMap(qrCode: String) = HashMap<String, String>().apply {
         put("qrCode", qrCode)
     }
 

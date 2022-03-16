@@ -76,6 +76,8 @@ dependencies {
     implementation "com.google.code.gson:gson:$gsonVersion"
 
     implementation "androidx.recyclerview:recyclerview:1.2.1"
+    
+    implementation "com.github.ikws4:TreeView:0.1.1"
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

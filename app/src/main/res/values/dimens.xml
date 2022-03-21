@@ -2,4 +2,8 @@
     <dimen name="big_width">260dp</dimen>
     <dimen name="medium_space">12dp</dimen>
     <dimen name="large_space">30dp</dimen>
+
+    <dimen name="menu_corner_radius">10dp</dimen>
+    <dimen name="menu_elevation">8dp</dimen>
+
 </resources>

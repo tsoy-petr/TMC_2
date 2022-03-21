@@ -23,14 +23,15 @@ class ScanningTMCViewModel @Inject constructor(
     val currImgListPosition = _currImgListPosition.asStateFlow()
 
     private var currQrCode = ""
-    private val _fSatate = MutableStateFlow<ViewState>(ViewState(state = State.Init))
-    val fState = _fSatate.asStateFlow()
+    private val _fState = MutableStateFlow<ViewState>(ViewState(state = State.Init))
+    val fState = _fState.asStateFlow()
 
+    fun getCurrQrCode() = currQrCode
     fun fetchData(qrCode: String) {
 
         currQrCode = qrCode
 
-        _fSatate.value = ViewState(state = State.Loading)
+        _fState.value = ViewState(state = State.Loading)
 
         getTMCByQrCode.invoke(
             params = GetTMCByQrCode.Params(qrCode),
@@ -57,11 +58,11 @@ class ScanningTMCViewModel @Inject constructor(
                 field.toTMCItem()
             }
         })
-        _fSatate.value = ViewState(state = State.Success, items = items, imgs = tmc.images)
+        _fState.value = ViewState(state = State.Success, items = items, imgs = tmc.images)
     }
 
     private fun handleFailure(error: Failure) {
-        _fSatate.value = ViewState(state = State.Error(error.toString()))
+        _fState.value = ViewState(state = State.Error(error.toString()))
     }
 
     fun setCurrImgListPosition(imgListPosition: Int) {

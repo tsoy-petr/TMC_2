@@ -28,10 +28,10 @@ import kotlin.coroutines.CoroutineContext
  * By convention each [UseCase] implementation will execute its job in a background thread
  * (kotlin coroutine) and will post the result in the UI thread.
  */
-abstract class UseCase<out Type, in Params> where Type : Any {
-
-    var backgroundContext: CoroutineContext = Dispatchers.IO
-    var foregroundContext: CoroutineContext = Dispatchers.Main
+abstract class UseCase<out Type, in Params>(
+    private val backgroundContext: CoroutineContext,
+    private val foregroundContext: CoroutineContext,
+) where Type : Any {
 
     private var parentJob: Job = Job()
 
@@ -39,11 +39,17 @@ abstract class UseCase<out Type, in Params> where Type : Any {
 
     operator fun invoke(
         params: Params,
-        scope: CoroutineScope?,
+        scope: CoroutineScope,
         onResult: (Either<Failure, Type>) -> Unit = {},
     ) {
-        val currScope = scope ?: CoroutineScope(foregroundContext + parentJob)
-        currScope.launch(foregroundContext) {
+//        val currScope = scope ?: CoroutineScope(foregroundContext + parentJob)
+//        currScope.launch(foregroundContext) {
+//            val deferred = async(backgroundContext) {
+//                run(params)
+//            }
+//            onResult(deferred.await())
+//        }
+        scope.launch(foregroundContext) {
             val deferred = async(backgroundContext) {
                 run(params)
             }

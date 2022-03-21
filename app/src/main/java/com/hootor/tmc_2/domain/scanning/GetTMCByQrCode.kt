@@ -1,14 +1,22 @@
 package com.hootor.tmc_2.domain.scanning
 
+import com.hootor.tmc_2.di.IoDispatcher
+import com.hootor.tmc_2.di.MainDispatcher
 import com.hootor.tmc_2.domain.exception.Failure
 import com.hootor.tmc_2.domain.functional.Either
 import com.hootor.tmc_2.domain.interactor.UseCase
 import com.hootor.tmc_2.domain.tmc.TMC
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 class GetTMCByQrCode @Inject constructor(
     private val scanningTMCRepository: ScanningTMCRepository,
-) : UseCase<TMC, GetTMCByQrCode.Params>() {
+    @IoDispatcher
+    backgroundContext: CoroutineContext,
+    @MainDispatcher
+    foregroundContext: CoroutineContext,
+) : UseCase<TMC, GetTMCByQrCode.Params>(backgroundContext = backgroundContext,
+    foregroundContext = foregroundContext) {
 
 
     data class Params(val qrCode: String)

@@ -8,9 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -42,10 +40,12 @@ import com.hootor.tmc_2.screens.main.scanning.tmc.holders.FieldTMCDescription
 import com.hootor.tmc_2.screens.main.scanning.tmc.holders.HorizontalImgTMC
 import com.hootor.tmc_2.screens.main.scanning.tmc.holders.HorizontalItem
 import com.hootor.tmc_2.screens.main.scanning.tmc.holders.TMCItem
+import com.hootor.tmc_2.screens.main.tmcTree.TMCTreeFragment.Companion.KEY_ARGS_QR_CODE
 import com.hootor.tmc_2.screens.view.bottomEndParentConstraint
 import com.hootor.tmc_2.screens.view.getMarginBottom
 import com.hootor.tmc_2.screens.view.matchParentConstraint
 import com.hootor.tmc_2.utils.findTopNavController
+import com.hootor.tmc_2.utils.listenResults
 import com.hootor.tmc_2.utils.observeEvent
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -93,7 +93,7 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        setHasOptionsMenu(true)
         imgFieldAdapter = FieldsTMCAdapter(listOf(HorizontalImgTMC(prefs)))
 
     }
@@ -130,6 +130,21 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.topToolbar.inflateMenu(R.menu.tmc_scanning_menu)
+        binding.topToolbar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.itemMenuGetComposition -> {
+                    viewModel.getCurrQrCode().takeIf {
+                        it.isNotEmpty()
+                    }?.let { qrCode ->
+                        findTopNavController().navigate(R.id.action_tabsFragment_to_tmc_tree_graph,
+                            bundleOf(KEY_ARGS_QR_CODE to qrCode))
+                    }
+                    true
+                }
+                else -> false
+            }
+        }
         binding.floatingActionButtonToStartScanning.setOnClickListener {
             requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
@@ -138,12 +153,36 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
             viewModel.reload()
         }
 
+        listenResults<String>("uuid"){
+            Toast.makeText(requireContext(), "uuid: $it", Toast.LENGTH_SHORT).show()
+        }
+
     }
 
     override fun onAttach(context: Context) {
         component.inject(this)
         super.onAttach(context)
     }
+
+//    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+//        inflater.inflate(R.menu.tmc_scanning_menu, menu)
+//    }
+
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        return when (item.itemId) {
+//            R.id.itemMenuGetComposition -> {
+//                viewModel.getCurrQrCode().takeIf {
+//                    it.isNotEmpty()
+//                }?.let { qrCode ->
+//                    findTopNavController().navigate(R.id.action_tabsFragment_to_tmc_tree_graph,
+//                        bundleOf(KEY_ARGS_QR_CODE to qrCode))
+//                }
+//                true
+//            }
+//            else -> super.onOptionsItemSelected(item)
+//        }
+//
+//    }
 
     private fun initNewAdapter() {
         with(binding.itemsFieldsList) {
@@ -246,13 +285,17 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
         binding.textViewError.text = textError
     }
 
-    private fun onClickTMCItem(item: TMCItem) {
-        findTopNavController().navigate(R.id.action_tabsFragment_to_tmc_tree_graph,
-        bundleOf("qrCode" to item.))
-    }
+    private fun onClickTMCItem(item: TMCItem) =
+        viewModel.getCurrQrCode().takeIf {
+            it.isNotEmpty()
+        }?.let { qrCode ->
+            findTopNavController().navigate(R.id.action_tabsFragment_to_tmc_tree_graph,
+                bundleOf(KEY_ARGS_QR_CODE to qrCode))
+        }
 
     private fun animateOut(button: FloatingActionButton) {
-        ViewCompat.animate(button).translationY((button.height + button.getMarginBottom()).toFloat())
+        ViewCompat.animate(button)
+            .translationY((button.height + button.getMarginBottom()).toFloat())
             .setInterpolator(inInterpolator).withLayer()
             .setListener(object : ViewPropertyAnimatorListener {
                 override fun onAnimationStart(view: View) {

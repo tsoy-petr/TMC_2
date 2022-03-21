@@ -17,11 +17,11 @@ interface TMCService {
     fun fetchTMC(@Path("qrCode", encoded = false) qrCode: String): Call<TMC>
 
     @FormUrlEncoded
-    @POST(GET_TMC_BY_QRCODE)
+    @POST(GET_TMC_TREE_BY_QRCODE)
     fun getTMCTreeByQrCode(@FieldMap params: Map<String, String>): Call<GetTMCTreeQrCodeResponse>
 
     @FormUrlEncoded
-    @POST(GET_TMC_TREE_BY_QRCODE)
+    @POST(GET_TMC_BY_QRCODE)
     fun getTMCBtQrCode(@FieldMap params: Map<String, String>): Call<GetTMCByQrCodeResponse>
 
     companion object {

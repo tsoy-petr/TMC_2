@@ -4,6 +4,8 @@ import android.content.res.Resources
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 fun FloatingActionButton.matchParentConstraint() {
@@ -41,3 +43,4 @@ val Int.dp: Int
     get() = (this / Resources.getSystem().displayMetrics.density).toInt()
 val Int.px: Int
     get() = (this * Resources.getSystem().displayMetrics.density).toInt()
+

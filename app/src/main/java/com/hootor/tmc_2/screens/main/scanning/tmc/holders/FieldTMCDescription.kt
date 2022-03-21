@@ -43,7 +43,7 @@ class FieldTMCDescriptionViewHolder(onClick: (TMCItem) -> Unit, binding: ItemTmc
     init {
         binding.descriptionTmcTextView.setOnClickListener {
             if (bindingAdapterPosition == RecyclerView.NO_POSITION) return@setOnClickListener
-            onClick(payl)
+            onClick(item)
         }
     }
     override fun onBind(item: TMCItem) {

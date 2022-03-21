@@ -5,5 +5,5 @@ import com.hootor.tmc_2.domain.functional.Either
 import com.hootor.tmc_2.domain.tmc.TMCTree
 
 interface GetTMCTreeQrCodeRepository {
-    fun getTreeByQrCode(qrCode: String): Either<Failure, List<TMCTree>>
+    fun getTreeByQrCode(qrCode: String): Either<Failure, TMCTree>
 }

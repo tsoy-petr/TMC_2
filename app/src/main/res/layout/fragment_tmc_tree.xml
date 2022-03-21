@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".screens.main.tmcTree.TMCTreeFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
+    <io.github.ikws4.treeview.TreeView
+        android:id="@+id/rvTreeTMC"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

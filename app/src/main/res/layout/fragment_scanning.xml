@@ -6,6 +6,22 @@
     android:layout_height="match_parent"
     tools:context=".screens.main.scanning.tmc.ScanningTMCFragment">
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topToolbar"
+            style="@style/Widget.MaterialComponents.Toolbar.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/itemsFieldsList"
         android:layout_width="match_parent"
@@ -13,7 +29,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
         tools:listitem="@layout/item_tmc_field" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -48,15 +64,15 @@
         android:layout_width="wrap_content"
         android:layout_height="38dp"
         android:layout_marginBottom="8dp"
+        android:textAlignment="gravity"
         android:textSize="28sp"
         android:textStyle="bold"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/buttonReload"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
-        android:visibility="gone"
-        android:textAlignment="gravity"
         tools:text="ERRORscscscscsc" />
 
     <Button
@@ -78,9 +94,9 @@
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/groupError"
-        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:constraint_referenced_ids="buttonReload,textViewError" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

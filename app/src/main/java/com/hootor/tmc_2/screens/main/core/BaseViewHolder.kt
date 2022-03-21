@@ -3,7 +3,7 @@ package com.hootor.tmc_2.screens.main.core
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 
-open abstract class BaseViewHolder<out V : ViewBinding, I : Item>(
+abstract class BaseViewHolder<out V : ViewBinding, I : Item>(
     val binding: V
 ) : RecyclerView.ViewHolder(binding.root) {
 

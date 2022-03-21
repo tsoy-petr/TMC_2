@@ -2,6 +2,7 @@ package com.hootor.tmc_2.data.scanningQrCode
 
 import com.hootor.tmc_2.domain.exception.Failure
 import com.hootor.tmc_2.domain.functional.Either
+import com.hootor.tmc_2.domain.functional.flatMap
 import com.hootor.tmc_2.domain.scanning.ScanningTMCRepository
 import com.hootor.tmc_2.domain.tmc.TMC
 import com.hootor.tmc_2.services.TMCService
@@ -16,6 +17,5 @@ class ScanningTMCRepositoryImpl
         return tmcService.fetchTMC(qrCode).make(
             {it}, TMC.empty()
         )
-
     }
 }

@@ -28,5 +28,6 @@
     <string name="camera_permission_granted">Camera permission has been granted</string>
     <string name="permissions_denied_forever">Permissions are denied forever</string>
     <string name="reload_again">Повторить</string>
+    <string name="title_composition">Состав</string>
 
 </resources>

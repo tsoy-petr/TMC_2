@@ -6,5 +6,5 @@ import com.hootor.tmc_2.services.core.BaseResponse
 class GetTMCTreeQrCodeResponse(
     success: Int,
     message: String,
-    var tmcTree: List<TMCTree> = emptyList()
+    var tmcTree: TMCTree? = null
 ) : BaseResponse(success, message)

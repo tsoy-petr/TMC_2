@@ -50,7 +50,6 @@ class HorizontalImgViewHolder(
     private val adapterImg = SliderAdapterTMC(prefs)
 
     init {
-        Log.i("happy", "HorizontalImgViewHolder.init")
         with(binding.imageSliderItem) {
             setSliderAdapter(adapterImg)
             autoCycleDirection = SliderView.AUTO_CYCLE_DIRECTION_BACK_AND_FORTH

@@ -15,6 +15,7 @@ class TMCTreeViewModel @Inject constructor(
     private val getTMCTreeByQrCodeUseCase: GetTMCTreeByQrCodeUseCase,
 ) : ViewModel() {
 
+    private var currentItem: TMCTree? = null
     private val _state = MutableStateFlow(ViewState(state = State.Init))
     val state = _state.asStateFlow()
 
@@ -41,6 +42,12 @@ class TMCTreeViewModel @Inject constructor(
             update { copy(state = State.Empty) }
         }else update{ copy(state = State.Error(error.toString())) }
     }
+
+    fun setCurrentItem(newItem: TMCTree) {
+        currentItem = newItem
+    }
+
+    fun getCurrentItem() = currentItem
 
 }
 

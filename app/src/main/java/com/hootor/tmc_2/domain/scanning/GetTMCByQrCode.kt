@@ -18,7 +18,6 @@ class GetTMCByQrCode @Inject constructor(
 ) : UseCase<TMC, GetTMCByQrCode.Params>(backgroundContext = backgroundContext,
     foregroundContext = foregroundContext) {
 
-
     data class Params(val qrCode: String)
 
     override suspend fun run(params: Params): Either<Failure, TMC> {

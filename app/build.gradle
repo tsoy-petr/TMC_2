@@ -53,6 +53,7 @@ dependencies {
 
     implementation 'com.google.dagger:dagger:2.41'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.camera:camera-view:1.1.0-beta02'
     kapt 'com.google.dagger:dagger-compiler:2.41'
 
     implementation 'androidx.navigation:navigation-fragment-ktx:2.4.1'
@@ -67,7 +68,7 @@ dependencies {
 
     implementation 'com.github.bumptech.glide:glide:4.13.0'
     implementation 'jp.wasabeef:glide-transformations:4.3.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.13.0'
+    kapt 'com.github.bumptech.glide:compiler:4.13.0'
 
     //retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
@@ -83,6 +84,22 @@ dependencies {
 
     //powermenu (popap menu)
     implementation "com.github.skydoves:powermenu:2.2.0"
+
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-ktx:$room_version" // optional, Coroutines & Flows support
+
+    // CameraX core library using the camera2 implementation
+    def camerax_version = "1.1.0-alpha08"
+    // The following line is optional, as the core library is included indirectly by camera-camera2
+    implementation "androidx.camera:camera-core:${camerax_version}"
+    implementation "androidx.camera:camera-camera2:${camerax_version}"
+    // If you want to additionally use the CameraX Lifecycle library
+    implementation "androidx.camera:camera-lifecycle:${camerax_version}"
+    // If you want to additionally use the CameraX View class
+    implementation "androidx.camera:camera-view:1.1.0-beta02"
+    // If you want to additionally use the CameraX Extensions library
+    implementation "androidx.camera:camera-extensions:1.1.0-beta02"
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

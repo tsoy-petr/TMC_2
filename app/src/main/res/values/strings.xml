@@ -29,5 +29,7 @@
     <string name="permissions_denied_forever">Permissions are denied forever</string>
     <string name="reload_again">Повторить</string>
     <string name="title_composition">Состав</string>
+    <string name="textEmptydata">Нет данных</string>
+    <string name="takePhoto">Сделать фото</string>
 
 </resources>

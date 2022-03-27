@@ -9,7 +9,7 @@
         android:id="@+id/settingsFragmentLaunch"
         android:name="com.hootor.tmc_2.screens.main.settings.SettingsFragment"
         android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" >
+        tools:layout="@layout/fragment_settings">
         <action
             android:id="@+id/action_settingsFragmentLaunch_to_tabsFragment"
             app:destination="@id/tabsFragment" />
@@ -18,10 +18,16 @@
         android:id="@+id/tabsFragment"
         android:name="com.hootor.tmc_2.screens.main.tabs.TabsFragment"
         android:label="fragment_tabs"
-        tools:layout="@layout/fragment_tabs" >
+        tools:layout="@layout/fragment_tabs">
         <action
             android:id="@+id/action_tabsFragment_to_tmc_tree_graph"
             app:destination="@id/tmc_tree_graph" />
+        <action
+            android:id="@+id/action_tabsFragment_to_take_photo_graph"
+            app:destination="@id/take_photo_graph" />
     </fragment>
+
     <include app:graph="@navigation/tmc_tree_graph" />
+    <include app:graph="@navigation/take_photo_graph" />
+
 </navigation>

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -32,6 +33,7 @@ import com.hootor.tmc_2.R
 import com.hootor.tmc_2.data.Prefs
 import com.hootor.tmc_2.databinding.FragmentScanningBinding
 import com.hootor.tmc_2.di.ViewModelFactory
+import com.hootor.tmc_2.screens.main.photo.PhotoFragment.Companion.KEY_ARGS_SAVE_URI
 import com.hootor.tmc_2.screens.main.scanning.qr.ScanningViewModel
 import com.hootor.tmc_2.screens.main.scanning.tmc.adapter.*
 import com.hootor.tmc_2.screens.main.scanning.tmc.adapter.decorations.FeedHorizontalDividerItemDecoration
@@ -44,6 +46,7 @@ import com.hootor.tmc_2.screens.main.tmcTree.TMCTreeFragment.Companion.KEY_ARGS_
 import com.hootor.tmc_2.screens.view.bottomEndParentConstraint
 import com.hootor.tmc_2.screens.view.getMarginBottom
 import com.hootor.tmc_2.screens.view.matchParentConstraint
+import com.hootor.tmc_2.utils.Event
 import com.hootor.tmc_2.utils.findTopNavController
 import com.hootor.tmc_2.utils.listenResults
 import com.hootor.tmc_2.utils.observeEvent
@@ -63,7 +66,6 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
     private lateinit var imgFieldAdapter: FieldsTMCAdapter
 
     private val concatAdapter by lazy {
-        Log.i("happy", "concatAdapter")
         ConcatAdapter(
             ConcatAdapter.Config.Builder()
                 .setIsolateViewTypes(false)
@@ -87,7 +89,7 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
     }
 
     private val requestCameraPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission(),    // contract for requesting 1 permission
+        ActivityResultContracts.RequestMultiplePermissions(),    // contract for requesting 1 permission
         ::onGotCameraPermissionResult
     )
 
@@ -130,6 +132,32 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initMenu()
+
+        binding.floatingActionButtonToStartScanning.setOnClickListener {
+            requestCameraPermissionLauncher.launch(mutableListOf(
+                Manifest.permission.CAMERA
+            ).toTypedArray())
+        }
+        binding.buttonReload.setOnClickListener {
+            viewModel.reload()
+        }
+
+        listenFragmentResult()
+
+    }
+
+    private fun listenFragmentResult(){
+        listenResults<String>(KEY_ARGS_QR_CODE) {
+            viewModel.fetchData(it)
+        }
+
+        listenResults<Event<Uri?>>(KEY_ARGS_SAVE_URI) {
+            Toast.makeText(requireContext(), "uri: $it", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun initMenu() {
         binding.topToolbar.inflateMenu(R.menu.tmc_scanning_menu)
         binding.topToolbar.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -142,47 +170,19 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
                     }
                     true
                 }
+                R.id.itemMenuTakePhoto -> {
+                    findTopNavController().navigate(R.id.action_tabsFragment_to_take_photo_graph)
+                    true
+                }
                 else -> false
             }
         }
-        binding.floatingActionButtonToStartScanning.setOnClickListener {
-            requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-        }
-
-        binding.buttonReload.setOnClickListener {
-            viewModel.reload()
-        }
-
-        listenResults<String>("uuid"){
-            Toast.makeText(requireContext(), "uuid: $it", Toast.LENGTH_SHORT).show()
-        }
-
     }
 
     override fun onAttach(context: Context) {
         component.inject(this)
         super.onAttach(context)
     }
-
-//    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-//        inflater.inflate(R.menu.tmc_scanning_menu, menu)
-//    }
-
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        return when (item.itemId) {
-//            R.id.itemMenuGetComposition -> {
-//                viewModel.getCurrQrCode().takeIf {
-//                    it.isNotEmpty()
-//                }?.let { qrCode ->
-//                    findTopNavController().navigate(R.id.action_tabsFragment_to_tmc_tree_graph,
-//                        bundleOf(KEY_ARGS_QR_CODE to qrCode))
-//                }
-//                true
-//            }
-//            else -> super.onOptionsItemSelected(item)
-//        }
-//
-//    }
 
     private fun initNewAdapter() {
         with(binding.itemsFieldsList) {
@@ -208,18 +208,35 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
         when (event.state) {
             is State.Loading -> {
                 showLoading()
+                showMenuItemComposition(false)
             }
             is State.Empty -> {
                 showEmpty()
+                showMenuItemComposition(false)
             }
             is State.Success -> {
                 showSuccess(event)
+                showMenuItemComposition(true)
             }
             is State.Error -> {
                 showError(event.state)
+                showMenuItemComposition(false)
             }
             is State.Init -> {
                 showInit()
+                showMenuItemComposition(false)
+            }
+        }
+    }
+
+    private fun showMenuItemComposition(isShow: Boolean) {
+        binding.topToolbar.menu.apply {
+            findItem(R.id.itemMenuGetComposition)?.let {
+                it.isVisible = isShow
+
+            }
+            findItem(R.id.itemMenuTakePhoto)?.let {
+                it.isVisible = isShow
             }
         }
     }
@@ -285,13 +302,14 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
         binding.textViewError.text = textError
     }
 
-    private fun onClickTMCItem(item: TMCItem) =
-        viewModel.getCurrQrCode().takeIf {
-            it.isNotEmpty()
-        }?.let { qrCode ->
-            findTopNavController().navigate(R.id.action_tabsFragment_to_tmc_tree_graph,
-                bundleOf(KEY_ARGS_QR_CODE to qrCode))
-        }
+    private fun onClickTMCItem(item: TMCItem) {}
+//    private fun onClickTMCItem(item: TMCItem) =
+//        viewModel.getCurrQrCode().takeIf {
+//            it.isNotEmpty()
+//        }?.let { qrCode ->
+//            findTopNavController().navigate(R.id.action_tabsFragment_to_tmc_tree_graph,
+//                bundleOf(KEY_ARGS_QR_CODE to qrCode))
+//        }
 
     private fun animateOut(button: FloatingActionButton) {
         ViewCompat.animate(button)
@@ -321,9 +339,35 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
             .start()
     }
 
-    private fun onGotCameraPermissionResult(granted: Boolean) {
+    private fun onGotCameraPermissionResult(isGranted: Map<String, Boolean>) {
+        var granted = true
+        isGranted.forEach {
+            if (granted) {
+                granted = it.value
+            }
+        }
         if (granted) {
             launchScanning()
+        } else {
+            // example of handling 'Deny & don't ask again' user choice
+            if (!shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
+                askUserForOpeningAppSettings()
+            } else {
+                Toast.makeText(requireContext(), R.string.permission_denied, Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+    }
+
+    private fun onGotPhotoPermissionResult(isGranted: Map<String, Boolean>) {
+        var granted = true
+        isGranted.forEach {
+            if (granted) {
+                granted = it.value
+            }
+        }
+        if (granted) {
+
         } else {
             // example of handling 'Deny & don't ask again' user choice
             if (!shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {

@@ -6,6 +6,8 @@ buildscript {
     ext.nav_version = "2.5.0-alpha03"
     ext.retrofitVersion = "2.9.0"
     ext.gsonVersion = "2.8.7"
+    ext.room_version = "2.4.2"
+
     repositories {
         google()
         mavenCentral()

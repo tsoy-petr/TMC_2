@@ -6,8 +6,12 @@
         <entry key="..\:/Users/bildovich/.gradle/caches/transforms-3/1da736b85f30b4752daa0f4e24d66389/transformed/jetified-TreeView-0.1.1/res/layout/item_treeview.xml" value="0.18645833333333334" />
         <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/drawable/ic__image_placeholder.xml" value="0.196" />
         <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/drawable/ic_baseline_fiber_manual_record_24.xml" value="0.1945" />
+        <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/drawable/ic_baseline_minimize_24.xml" value="0.1965" />
+        <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/drawable/ic_composition.xml" value="0.1965" />
         <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/drawable/ic_group_open.xml" value="0.1945" />
         <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/drawable/ic_tree_element.xml" value="0.1955" />
+        <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/drawable/qr_code_24.xml" value="0.1965" />
+        <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/drawable/settings_24.xml" value="0.1965" />
         <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/drawable/splash.xml" value="0.174" />
         <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/layout/activity_main.xml" value="0.19114583333333332" />
         <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/layout/activity_splash.xml" value="0.19114583333333332" />
@@ -18,12 +22,13 @@
         <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/layout/fragment_settings.xml" value="0.33" />
         <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/layout/fragment_splash.xml" value="0.19114583333333332" />
         <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/layout/fragment_tabs.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/layout/fragment_take_photo.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/layout/fragment_tmc_tree.xml" value="0.18645833333333334" />
         <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/layout/frgament_scanning.xml" value="0.5151515151515151" />
         <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/layout/item_horizontal_slider.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/layout/item_tmc_field.xml" value="0.4111111111111111" />
         <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/layout/item_tmc_field_boolean.xml" value="0.36666666666666664" />
-        <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/layout/item_tmc_tree.xml" value="0.75" />
+        <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/layout/item_tmc_tree.xml" value="0.4370257966616085" />
         <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/layout/item_tms_image_slide.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/menu/tabs_menu.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/bildovich/Desktop/android/TMC_2/app/src/main/res/menu/tmc_scanning_menu.xml" value="0.36666666666666664" />

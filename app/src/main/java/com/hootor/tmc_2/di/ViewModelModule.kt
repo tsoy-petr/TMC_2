@@ -2,6 +2,7 @@ package com.hootor.tmc_2.di
 
 import androidx.lifecycle.ViewModel
 import com.hootor.tmc_2.screens.main.MainViewModel
+import com.hootor.tmc_2.screens.main.photo.UploadPhotoViewModel
 import com.hootor.tmc_2.screens.main.scanning.tmc.ScanningTMCViewModel
 import com.hootor.tmc_2.screens.main.scanning.qr.ScanningViewModel
 import com.hootor.tmc_2.screens.main.settings.SettingsViewModel
@@ -43,4 +44,9 @@ interface ViewModelModule {
     @IntoMap
     @ViewModelKey(TMCTreeViewModel::class)
     fun bindTMCTreeViewModel(viewModel: TMCTreeViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(UploadPhotoViewModel::class)
+    fun bindUploadPhotoViewModel(viewModel: UploadPhotoViewModel): ViewModel
 }

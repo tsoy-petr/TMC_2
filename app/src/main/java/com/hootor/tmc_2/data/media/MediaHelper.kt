@@ -17,6 +17,14 @@ import java.io.FileOutputStream
 
 object MediaHelper {
 
+    fun uriToBitmap(uri: Uri?): Bitmap?{
+
+        if (uri == null) return null
+
+        MediaStore.Images.Media.getBitmap(this. getContentResolver(), uri);
+
+    }
+
     fun encodeToBase64(bitmap: Bitmap, compressFormat: Bitmap.CompressFormat, quality: Int): String {
         val byteArrayOS = ByteArrayOutputStream()
         bitmap.compress(compressFormat, quality, byteArrayOS)
@@ -67,7 +75,7 @@ object MediaHelper {
             val mInputPFD = context.contentResolver.openFileDescriptor(uri, "r") ?: return null
             val fileDescriptor = mInputPFD.fileDescriptor
 
-            val image = BitmapFactory.decodeFileDescriptor(fileDescriptor)
+            val image: Bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor)
             val tempUri = getImageUri(context, image)
 
             return getAbsolutePath(context, tempUri)

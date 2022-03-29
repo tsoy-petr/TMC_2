@@ -40,6 +40,12 @@ interface DataModule {
 
         @ApplicationScope
         @Provides
+        fun bindGetMediaRepositoryImpl(application: Application): MediaRepository {
+            return MediaRepositoryImpl(application)
+        }
+
+        @ApplicationScope
+        @Provides
         fun provideSharedPreferences(application: Application): SharedPreferences {
             return application.getSharedPreferences(application.packageName, Context.MODE_PRIVATE)
         }

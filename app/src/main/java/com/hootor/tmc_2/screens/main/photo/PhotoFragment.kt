@@ -210,7 +210,7 @@ class PhotoFragment : Fragment(R.layout.fragment_take_photo) {
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    publishResults(KEY_ARGS_SAVE_URI, Event(output.savedUri))
+                    publishResults(KEY_ARGS_SAVE_URI, output.savedUri)
                     findNavController().popBackStack()
 //                    val msg = "Photo capture succeeded: ${output.savedUri}"
 //                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()

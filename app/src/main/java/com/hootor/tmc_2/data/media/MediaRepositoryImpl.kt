@@ -10,7 +10,6 @@ import com.hootor.tmc_2.domain.media.MediaRepository
 import java.io.File
 import javax.inject.Inject
 
-@ApplicationScope
 class MediaRepositoryImpl @Inject constructor(val context: Context): MediaRepository {
 
     override fun getPickedImage(uri: Uri?): Either<Failure, Bitmap> {

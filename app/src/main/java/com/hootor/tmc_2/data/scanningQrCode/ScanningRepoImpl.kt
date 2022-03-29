@@ -19,6 +19,16 @@ class ScanningRepoImpl @Inject constructor(
     ) {
         it.tmc
     }
+
+    override suspend fun uploadImage(qrCode: String, image: String): Either<Failure, Boolean> {
+        return request.make(tmcService.uploadTMCImage(HashMap<String, String>().apply {
+            put("qrCode", qrCode)
+            put("image", image)
+        })) {
+            it.result ?: false
+        }
+    }
+
     private fun createGetTMCByQrCodeResponseMap(qrCode: String) = HashMap<String, String>().apply {
         put("qrCode", qrCode)
     }

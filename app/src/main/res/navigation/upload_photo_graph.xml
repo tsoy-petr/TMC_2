@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/upload_photo_graph"
+    app:startDestination="@id/uploadPhotoFragment">
+    <fragment
+        android:id="@+id/uploadPhotoFragment"
+        android:name="com.hootor.tmc_2.screens.main.photo.UploadPhotoFragment"
+        android:label="fragment_upload_photo"
+        tools:layout="@layout/fragment_upload_photo" />
+</navigation>

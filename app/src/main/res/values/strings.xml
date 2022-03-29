@@ -31,5 +31,6 @@
     <string name="title_composition">Состав</string>
     <string name="textEmptydata">Нет данных</string>
     <string name="takePhoto">Сделать фото</string>
+    <string name="title_upload_image">Отправить</string>
 
 </resources>

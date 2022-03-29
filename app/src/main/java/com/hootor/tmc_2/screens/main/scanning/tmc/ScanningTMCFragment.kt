@@ -34,6 +34,8 @@ import com.hootor.tmc_2.data.Prefs
 import com.hootor.tmc_2.databinding.FragmentScanningBinding
 import com.hootor.tmc_2.di.ViewModelFactory
 import com.hootor.tmc_2.screens.main.photo.PhotoFragment.Companion.KEY_ARGS_SAVE_URI
+import com.hootor.tmc_2.screens.main.photo.UploadPhotoFragment
+import com.hootor.tmc_2.screens.main.photo.UploadPhotoFragment.Companion.KEY_ARGS_URI_IMAGE
 import com.hootor.tmc_2.screens.main.scanning.qr.ScanningViewModel
 import com.hootor.tmc_2.screens.main.scanning.tmc.adapter.*
 import com.hootor.tmc_2.screens.main.scanning.tmc.adapter.decorations.FeedHorizontalDividerItemDecoration
@@ -147,13 +149,19 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
 
     }
 
-    private fun listenFragmentResult(){
+    private fun listenFragmentResult() {
         listenResults<String>(KEY_ARGS_QR_CODE) {
             viewModel.fetchData(it)
         }
 
-        listenResults<Event<Uri?>>(KEY_ARGS_SAVE_URI) {
-            Toast.makeText(requireContext(), "uri: $it", Toast.LENGTH_SHORT).show()
+        listenResults<Uri?>(KEY_ARGS_SAVE_URI) {
+            it?.let { uri: Uri ->
+                findTopNavController().navigate(R.id.action_tabsFragment_to_upload_photo_graph,
+                    bundleOf(
+                        KEY_ARGS_URI_IMAGE to uri,
+                        UploadPhotoFragment.KEY_ARGS_QR_CODE to viewModel.getCurrQrCode()
+                    ))
+            }
         }
     }
 

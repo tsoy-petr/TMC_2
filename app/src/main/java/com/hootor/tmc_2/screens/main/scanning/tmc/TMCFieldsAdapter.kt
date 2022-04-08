@@ -26,7 +26,6 @@ class TMCFieldsAdapter : RecyclerView.Adapter<TMCFieldsAdapter.TMCViewHolder>() 
 
     override fun onBindViewHolder(holder: TMCViewHolder, position: Int) {
         val itemField = items[position]
-        val context = holder.itemView.context
         with(holder.binding){
             holder.itemView.tag = itemField
 

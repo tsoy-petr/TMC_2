@@ -36,6 +36,7 @@ import com.hootor.tmc_2.di.ViewModelFactory
 import com.hootor.tmc_2.screens.main.photo.PhotoFragment.Companion.KEY_ARGS_SAVE_URI
 import com.hootor.tmc_2.screens.main.photo.UploadPhotoFragment
 import com.hootor.tmc_2.screens.main.photo.UploadPhotoFragment.Companion.KEY_ARGS_URI_IMAGE
+import com.hootor.tmc_2.screens.main.photo.UploadPhotoFragment.Companion.KEY_RESULT_SEND_PHOTO
 import com.hootor.tmc_2.screens.main.scanning.qr.ScanningViewModel
 import com.hootor.tmc_2.screens.main.scanning.tmc.adapter.*
 import com.hootor.tmc_2.screens.main.scanning.tmc.adapter.decorations.FeedHorizontalDividerItemDecoration
@@ -111,8 +112,10 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
         binding = FragmentScanningBinding.inflate(inflater, container, false)
 
         viewModel = ViewModelProvider(this, viewModelFactory)[ScanningTMCViewModel::class.java]
-        viewModelScanning = ViewModelProvider(requireActivity().viewModelStore,
-            viewModelFactory)[ScanningViewModel::class.java]
+        viewModelScanning = ViewModelProvider(
+            requireActivity().viewModelStore,
+            viewModelFactory
+        )[ScanningViewModel::class.java]
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -137,9 +140,11 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
         initMenu()
 
         binding.floatingActionButtonToStartScanning.setOnClickListener {
-            requestCameraPermissionLauncher.launch(mutableListOf(
-                Manifest.permission.CAMERA
-            ).toTypedArray())
+            requestCameraPermissionLauncher.launch(
+                mutableListOf(
+                    Manifest.permission.CAMERA
+                ).toTypedArray()
+            )
         }
         binding.buttonReload.setOnClickListener {
             viewModel.reload()
@@ -150,17 +155,24 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
     }
 
     private fun listenFragmentResult() {
+
+        listenResults<Boolean>(KEY_RESULT_SEND_PHOTO) { resultSendPhoto ->
+            if (resultSendPhoto) viewModel.reloadPhoto()
+        }
+
         listenResults<String>(KEY_ARGS_QR_CODE) {
             viewModel.fetchData(it)
         }
 
         listenResults<Uri?>(KEY_ARGS_SAVE_URI) {
             it?.let { uri: Uri ->
-                findTopNavController().navigate(R.id.action_tabsFragment_to_upload_photo_graph,
+                findTopNavController().navigate(
+                    R.id.action_tabsFragment_to_upload_photo_graph,
                     bundleOf(
                         KEY_ARGS_URI_IMAGE to uri,
                         UploadPhotoFragment.KEY_ARGS_QR_CODE to viewModel.getCurrQrCode()
-                    ))
+                    )
+                )
             }
         }
     }
@@ -173,8 +185,10 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
                     viewModel.getCurrQrCode().takeIf {
                         it.isNotEmpty()
                     }?.let { qrCode ->
-                        findTopNavController().navigate(R.id.action_tabsFragment_to_tmc_tree_graph,
-                            bundleOf(KEY_ARGS_QR_CODE to qrCode))
+                        findTopNavController().navigate(
+                            R.id.action_tabsFragment_to_tmc_tree_graph,
+                            bundleOf(KEY_ARGS_QR_CODE to qrCode)
+                        )
                     }
                     true
                 }
@@ -233,6 +247,9 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
             is State.Init -> {
                 showInit()
                 showMenuItemComposition(false)
+            }
+            is State.SuccessPhoto -> {
+                imgFieldAdapter.submitList(listOf(event.state.imgs))
             }
         }
     }
@@ -310,7 +327,9 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
         binding.textViewError.text = textError
     }
 
-    private fun onClickTMCItem(item: TMCItem) {}
+    private fun onClickTMCItem(item: TMCItem) {
+        Log.i("happy", item.toString())
+    }
 //    private fun onClickTMCItem(item: TMCItem) =
 //        viewModel.getCurrQrCode().takeIf {
 //            it.isNotEmpty()
@@ -392,12 +411,16 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
             Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
             Uri.fromParts("package", requireActivity().packageName, null)
         )
-        if (requireActivity().packageManager.resolveActivity(appSettingsIntent,
-                PackageManager.MATCH_DEFAULT_ONLY) == null
+        if (requireActivity().packageManager.resolveActivity(
+                appSettingsIntent,
+                PackageManager.MATCH_DEFAULT_ONLY
+            ) == null
         ) {
-            Toast.makeText(requireContext(),
+            Toast.makeText(
+                requireContext(),
                 R.string.permissions_denied_forever,
-                Toast.LENGTH_SHORT).show()
+                Toast.LENGTH_SHORT
+            ).show()
         } else {
             AlertDialog.Builder(requireContext())
                 .setTitle(R.string.permission_denied)

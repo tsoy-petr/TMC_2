@@ -2,36 +2,36 @@ package com.hootor.tmc_2.screens.main.photo
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
+import androidx.core.net.toFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hootor.tmc_2.data.media.MediaHelper
 import com.hootor.tmc_2.domain.exception.Failure
-import com.hootor.tmc_2.domain.media.GetPickedImage
-import com.hootor.tmc_2.domain.media.UploadImage
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.hootor.tmc_2.domain.extantion.flatMapFlow
+import com.hootor.tmc_2.domain.functional.Either
+import com.hootor.tmc_2.domain.functional.getOrElse
+import com.hootor.tmc_2.domain.functional.map
+import com.hootor.tmc_2.domain.functional.onSuccess
+import com.hootor.tmc_2.domain.media.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 class UploadPhotoViewModel @Inject constructor(
-    private val getPickedImage: GetPickedImage,
-    private val uploadImage: UploadImage
+    private val sendImageFlow: SendImageFlow
 ) : ViewModel() {
 
     private var uri: Uri? = null
     private var qrCode: String = ""
-    private var bitmap: Bitmap? = null
     private val _state = MutableStateFlow(ViewState(State.Empty))
     val state = _state.asStateFlow()
 
     fun setUriFromArgs(argsUri: Uri) {
         uri = argsUri
-        update { copy(state = State.Loading) }
-        getPickedImage.invoke(
-            params = uri,
-            scope = viewModelScope
-        ) {
-            it.fold(::handleFailure, ::handleSuccess)
-        }
     }
 
     fun setQrCodeFromArgs(qrCodeFromRags: String) {
@@ -39,21 +39,49 @@ class UploadPhotoViewModel @Inject constructor(
     }
 
     fun upload() {
-        if (qrCode.isEmpty()){
+
+        if (qrCode.isEmpty()) {
             update { copy(state = State.Error("Не передан QR CODE")) }
             return
         }
-        update { copy(state = State.Uploading) }
-        uploadImage.invoke(UploadImage.Params(qrCode, MediaHelper.encodeToBase64(bitmap!!, Bitmap.CompressFormat.JPEG, 100)), viewModelScope)
+
+        if (uri == null) {
+            update { copy(state = State.Error("Не определена ссылка на изображение")) }
+            return
+        }
+
+        viewModelScope.launch {
+
+            sendImageFlow(SendImageFlow.Params(qrCode, uri!!)).onStart {
+                withContext(Dispatchers.Main) {
+                    update { copy(state = State.Uploading) }
+                }
+            }.flowOn(Dispatchers.IO)
+                .collect { res: Either<Failure, Boolean> ->
+                    res.fold(::handleError, ::handleUploadResult)
+                }
+//            getBitmapFromUri(uri!!).onStart {
+//                withContext(Dispatchers.Main) {
+//                    update { copy(state = State.Uploading) }
+//                }
+//            }.flatMapLatest { imageBitmap: Either<Failure, Bitmap> ->
+//                imageBitmap.flatMapFlow {
+//                    sendImageFlow(SendImageFlow.Params(qrCode, it, uri!!))
+//                }
+//            }.flowOn(Dispatchers.IO)
+//                .collect { res: Either<Failure, Boolean> ->
+//                    res.fold(::handleError, ::handleUploadResult)
+//                }
+        }
+
     }
 
-    private fun handleSuccess(bitmap: Bitmap) {
-        this.bitmap = bitmap
-        update { copy(state = State.Success(bitmap)) }
+    private fun handleUploadResult(isUpload: Boolean) {
+        update { copy(state = State.PopBackStack) }
     }
 
-    private fun handleFailure(error: Failure) {
-        update { copy(state = State.Error(error.toString())) }
+    private fun handleError(errorMessage: Failure) {
+        update { copy(state = State.Error(errorMessage.toString())) }
     }
 
     private fun update(mapper: ViewState.() -> ViewState = { this }) {
@@ -68,6 +96,7 @@ data class ViewState(
 sealed class State {
     object Loading : State()
     object Uploading : State()
+    object PopBackStack : State()
     data class Error(val message: String) : State()
     data class Success(val bitmap: Bitmap) : State()
     object Empty : State()

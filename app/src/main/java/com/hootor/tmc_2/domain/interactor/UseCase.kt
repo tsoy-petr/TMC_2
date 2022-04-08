@@ -42,13 +42,6 @@ abstract class UseCase<out Type, in Params>(
         scope: CoroutineScope,
         onResult: (Either<Failure, Type>) -> Unit = {},
     ) {
-//        val currScope = scope ?: CoroutineScope(foregroundContext + parentJob)
-//        currScope.launch(foregroundContext) {
-//            val deferred = async(backgroundContext) {
-//                run(params)
-//            }
-//            onResult(deferred.await())
-//        }
         scope.launch(foregroundContext) {
             val deferred = async(backgroundContext) {
                 run(params)

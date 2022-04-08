@@ -3,6 +3,7 @@ package com.hootor.tmc_2.screens.main.scanning.tmc
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hootor.tmc_2.domain.exception.Failure
+import com.hootor.tmc_2.domain.scanning.GetImagesTMCByQrCode
 import com.hootor.tmc_2.domain.scanning.GetTMCByQrCode
 import com.hootor.tmc_2.domain.tmc.ItemField
 import com.hootor.tmc_2.domain.tmc.TMC
@@ -17,10 +18,8 @@ import javax.inject.Inject
 
 class ScanningTMCViewModel @Inject constructor(
     private val getTMCByQrCode: GetTMCByQrCode,
+    private val getImagesTMCByQrCode: GetImagesTMCByQrCode
 ) : ViewModel() {
-
-    private var _currImgListPosition = MutableStateFlow<Int>(-1)
-    val currImgListPosition = _currImgListPosition.asStateFlow()
 
     private var currQrCode = ""
     private val _fState = MutableStateFlow<ViewState>(ViewState(state = State.Init))
@@ -65,11 +64,33 @@ class ScanningTMCViewModel @Inject constructor(
         _fState.value = ViewState(state = State.Error(error.toString()))
     }
 
-    fun setCurrImgListPosition(imgListPosition: Int) {
-        _currImgListPosition.value = imgListPosition
+    fun reloadPhoto() {
+
+        update {
+            copy(state = State.ReloadingPhoto)
+        }
+
+        val listDescriptions: MutableList<Item> = _fState.value.items.filter { it is TMCItemBoolean || it is TMCItem }.toMutableList()
+
+        getImagesTMCByQrCode(GetImagesTMCByQrCode.Params(currQrCode), viewModelScope){
+            it.fold({},{list: List<TMCSliderItem> ->
+                update{
+                    copy(state = State.SuccessPhoto(
+                       imgs = list.toHorizontalItem()
+                    ))
+                }
+            })
+        }
+    }
+
+    private fun update(mapper: ViewState.() -> ViewState = {
+        this
+    }) {
+        _fState.value = _fState.value.mapper()
     }
 
 }
+
 
 data class ViewState(
     val items: List<Item> = emptyList(),
@@ -80,8 +101,10 @@ data class ViewState(
 
 sealed class State {
     object Loading : State()
+    object ReloadingPhoto : State()
     data class Error(val message: String) : State()
     object Success : State()
+    data class SuccessPhoto(val imgs: Item) : State()
     object Empty : State()
     object Init : State()
 }

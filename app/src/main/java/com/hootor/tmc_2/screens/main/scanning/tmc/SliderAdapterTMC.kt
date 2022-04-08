@@ -31,7 +31,7 @@ class SliderAdapterTMC(private val prefs: Prefs) : SliderViewAdapter<SliderAdapt
     }
 
     override fun onBindViewHolder(holder: SliderAdapterVH, position: Int) {
-        val itemField = items[position]
+        val itemField: TMCSliderItem = items[position]
         holder.itemView.tag = itemField
 
         Log.i("happy", "SliderAdapterTMC.onBindViewHolder")

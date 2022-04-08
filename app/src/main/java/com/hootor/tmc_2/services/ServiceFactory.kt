@@ -33,8 +33,8 @@ class ServiceFactory @Inject constructor(
             .addInterceptor(hostSelectionInterceptor)
             .addInterceptor(httpLoggingInterceptor)
             .addInterceptor(authInterceptor)
-            .connectTimeout(120, TimeUnit.SECONDS)
-            .readTimeout(120, TimeUnit.SECONDS)
+            .connectTimeout(5000, TimeUnit.SECONDS)
+            .readTimeout(5000, TimeUnit.SECONDS)
             .build()
     }
 

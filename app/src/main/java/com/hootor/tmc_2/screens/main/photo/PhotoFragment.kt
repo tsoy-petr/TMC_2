@@ -10,9 +10,8 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Size
+import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
@@ -40,23 +39,28 @@ class PhotoFragment : Fragment(R.layout.fragment_take_photo) {
     private lateinit var binding: FragmentTakePhotoBinding
     private var imageCapture: ImageCapture? = null
     private lateinit var cameraExecutor: ExecutorService
+    private var orientationEventListener: OrientationEventListener? = null
 
-    private var animationListener: Animation.AnimationListener? = object : Animation.AnimationListener {
-        override fun onAnimationStart(p0: Animation?) {
-            binding.takePhoto.isEnabled = false
+    private var animationListener: Animation.AnimationListener? =
+        object : Animation.AnimationListener {
+            override fun onAnimationStart(p0: Animation?) {
+                binding.takePhoto.isEnabled = false
+            }
+
+            override fun onAnimationEnd(p0: Animation?) {
+                binding.takePhoto.isEnabled = true
+            }
+
+            override fun onAnimationRepeat(p0: Animation?) {
+
+            }
+
         }
 
-        override fun onAnimationEnd(p0: Animation?) {
-            binding.takePhoto.isEnabled = true
-        }
-
-        override fun onAnimationRepeat(p0: Animation?) {
-
-        }
-
-    }
-
-    private val requestPhotoPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions(), ::onGotPhotoPermissionResult)
+    private val requestPhotoPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions(),
+        ::onGotPhotoPermissionResult
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,7 +72,8 @@ class PhotoFragment : Fragment(R.layout.fragment_take_photo) {
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
                 add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
             }
-        }.toTypedArray())
+        }.toTypedArray()
+        )
 
     }
 
@@ -86,13 +91,63 @@ class PhotoFragment : Fragment(R.layout.fragment_take_photo) {
             animation.setAnimationListener(animationListener)
             binding.takePhoto.startAnimation(animation)
         }
+
+
+
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        iniOrientationListenerForCamera()
+    }
+
+    private fun iniOrientationListenerForCamera() {
+        orientationEventListener = object : OrientationEventListener(requireContext()) {
+            override fun onOrientationChanged(orientation: Int) {
+                imageCapture?.targetRotation = getOrientationFromDegrees(orientation)
+            }
+        }.apply {
+            enable()
+        }
+
+        val rotation = binding.viewFinder.display.rotation
+        val isLandscape = rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270
+
+        imageCapture = ImageCapture.Builder()
+            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+            .setTargetResolution(if (isLandscape) Size(1920, 1080) else Size(1080, 1920))
+            .setTargetRotation(rotation)
+            .build()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
         animationListener = null
+        orientationEventListener = null
+    }
+
+    private fun getOrientationFromDegrees(orientation: Int): Int {
+        return when {
+            orientation == OrientationEventListener.ORIENTATION_UNKNOWN -> {
+                Surface.ROTATION_0
+            }
+            orientation >= 315 || orientation < 45 -> {
+                Surface.ROTATION_0 //portrait
+            }
+            orientation < 135 -> {
+                //Surface.ROTATION_90
+                Surface.ROTATION_270 //landscape
+            }
+            orientation < 225 -> {
+                Surface.ROTATION_180
+            }
+            else -> {
+                //Surface.ROTATION_270
+                Surface.ROTATION_90
+            }
+        }
     }
 
     private fun startCamera() {
@@ -110,8 +165,8 @@ class PhotoFragment : Fragment(R.layout.fragment_take_photo) {
                     it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
                 }
 
-            imageCapture = ImageCapture.Builder()
-                .build()
+//            imageCapture = ImageCapture.Builder()
+//                .build()
 
             // Select back camera as a default
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
@@ -122,7 +177,8 @@ class PhotoFragment : Fragment(R.layout.fragment_take_photo) {
 
                 // Bind use cases to camera
                 cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageCapture)
+                    this, cameraSelector, preview, imageCapture
+                )
 
             } catch (exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
@@ -144,7 +200,10 @@ class PhotoFragment : Fragment(R.layout.fragment_take_photo) {
         } else {
             // example of handling 'Deny & don't ask again' user choice
             if (!shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)
-                ||!shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)||!shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                || !shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE) || !shouldShowRequestPermissionRationale(
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                )
+            ) {
                 askUserForOpeningAppSettings()
             } else {
                 Toast.makeText(requireContext(), R.string.permission_denied, Toast.LENGTH_SHORT)
@@ -159,12 +218,16 @@ class PhotoFragment : Fragment(R.layout.fragment_take_photo) {
             Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
             Uri.fromParts("package", requireActivity().packageName, null)
         )
-        if (requireActivity().packageManager.resolveActivity(appSettingsIntent,
-                PackageManager.MATCH_DEFAULT_ONLY) == null
+        if (requireActivity().packageManager.resolveActivity(
+                appSettingsIntent,
+                PackageManager.MATCH_DEFAULT_ONLY
+            ) == null
         ) {
-            Toast.makeText(requireContext(),
+            Toast.makeText(
+                requireContext(),
                 R.string.permissions_denied_forever,
-                Toast.LENGTH_SHORT).show()
+                Toast.LENGTH_SHORT
+            ).show()
         } else {
             AlertDialog.Builder(requireContext())
                 .setTitle(R.string.permission_denied)
@@ -193,9 +256,11 @@ class PhotoFragment : Fragment(R.layout.fragment_take_photo) {
 
         // Create output options object which contains file + metadata
         val outputOptions: ImageCapture.OutputFileOptions = ImageCapture.OutputFileOptions
-            .Builder(requireContext().contentResolver,
+            .Builder(
+                requireContext().contentResolver,
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                contentValues)
+                contentValues
+            )
             .build()
 
         // Set up image capture listener, which is triggered after photo has

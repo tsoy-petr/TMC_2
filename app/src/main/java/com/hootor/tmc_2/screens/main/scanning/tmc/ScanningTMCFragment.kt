@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
@@ -31,6 +33,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hootor.tmc_2.App
 import com.hootor.tmc_2.R
 import com.hootor.tmc_2.data.Prefs
+import com.hootor.tmc_2.data.media.MediaHelper
 import com.hootor.tmc_2.databinding.FragmentScanningBinding
 import com.hootor.tmc_2.di.ViewModelFactory
 import com.hootor.tmc_2.screens.main.photo.PhotoFragment.Companion.KEY_ARGS_SAVE_URI
@@ -49,12 +52,10 @@ import com.hootor.tmc_2.screens.main.tmcTree.TMCTreeFragment.Companion.KEY_ARGS_
 import com.hootor.tmc_2.screens.view.bottomEndParentConstraint
 import com.hootor.tmc_2.screens.view.getMarginBottom
 import com.hootor.tmc_2.screens.view.matchParentConstraint
-import com.hootor.tmc_2.utils.Event
-import com.hootor.tmc_2.utils.findTopNavController
-import com.hootor.tmc_2.utils.listenResults
-import com.hootor.tmc_2.utils.observeEvent
+import com.hootor.tmc_2.utils.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
@@ -95,6 +96,18 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
         ActivityResultContracts.RequestMultiplePermissions(),    // contract for requesting 1 permission
         ::onGotCameraPermissionResult
     )
+
+    val takePhotoFromPreview = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { imgBitmap: Bitmap ->
+
+        findTopNavController().navigate(
+            R.id.action_tabsFragment_to_upload_photo_graph,
+            bundleOf(
+                KEY_ARGS_URI_IMAGE to savePhotoToInternalStorage(UUID.randomUUID().toString(), imgBitmap),
+                UploadPhotoFragment.KEY_ARGS_QR_CODE to viewModel.getCurrQrCode()
+            )
+        )
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -193,7 +206,8 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
                     true
                 }
                 R.id.itemMenuTakePhoto -> {
-                    findTopNavController().navigate(R.id.action_tabsFragment_to_take_photo_graph)
+                   findTopNavController().navigate(R.id.action_tabsFragment_to_take_photo_graph)
+//                    takePhotoFromPreview.launch()
                     true
                 }
                 else -> false

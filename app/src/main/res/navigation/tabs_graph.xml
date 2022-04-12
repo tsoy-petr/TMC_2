@@ -6,4 +6,5 @@
 
     <include app:graph="@navigation/scanning_tmc_graph" />
     <include app:graph="@navigation/settings_graph" />
+    <include app:graph="@navigation/docs_menu_graph" />
 </navigation>

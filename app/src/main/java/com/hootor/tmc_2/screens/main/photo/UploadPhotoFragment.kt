@@ -68,7 +68,6 @@ class UploadPhotoFragment : Fragment(R.layout.fragment_upload_photo) {
         requireArguments().apply {
             getParcelable<Uri>(KEY_ARGS_URI_IMAGE)?.let { uri ->
                 binding.imageUpload.setImageURI(uri)
-
 //                binding.imageUpload.swipeToDismissEnabled = true
 
                 viewModel.setUriFromArgs(uri)

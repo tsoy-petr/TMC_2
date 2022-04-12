@@ -20,6 +20,7 @@
     <string name="title_user_pass">Пароль пользователя</string>
     <string name="title_scanning_tmc">Сканирование ТМЦ</string>
     <string name="title_settings">Настройки</string>
+    <string name="title_docs">Документы</string>
     <string name="click_to_start_scanning_fragment">Click to start scanning fragment</string>
 
     <string name="permission_denied">Permission denied</string>
@@ -32,5 +33,6 @@
     <string name="textEmptydata">Нет данных</string>
     <string name="takePhoto">Сделать фото</string>
     <string name="title_upload_image">Отправить</string>
+    <string name="title_OpenInventory">Инвентаризация</string>
 
 </resources>

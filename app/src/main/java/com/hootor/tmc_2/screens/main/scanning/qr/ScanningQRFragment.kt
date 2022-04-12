@@ -48,6 +48,7 @@ class ScanningQRFragment: Fragment(), ZXingScannerView.ResultHandler {
     }
 
     override fun onPause() {
+        mScannerView.stopCameraPreview()
         mScannerView.stopCamera()
         super.onPause()
     }

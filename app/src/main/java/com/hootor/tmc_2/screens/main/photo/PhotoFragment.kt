@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
@@ -30,6 +31,10 @@ import com.hootor.tmc_2.databinding.FragmentTakePhotoBinding
 import com.hootor.tmc_2.utils.Event
 import com.hootor.tmc_2.utils.FileUtil
 import com.hootor.tmc_2.utils.publishResults
+import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -165,9 +170,6 @@ class PhotoFragment : Fragment(R.layout.fragment_take_photo) {
                     it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
                 }
 
-//            imageCapture = ImageCapture.Builder()
-//                .build()
-
             // Select back camera as a default
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
@@ -244,6 +246,8 @@ class PhotoFragment : Fragment(R.layout.fragment_take_photo) {
         // Get a stable reference of the modifiable image capture use case
         val imageCapture = imageCapture ?: return
 
+//
+
         // Create time stamped name and MediaStore entry.
         val name = FileUtil.getFileName()
         val contentValues = ContentValues().apply {
@@ -258,7 +262,7 @@ class PhotoFragment : Fragment(R.layout.fragment_take_photo) {
         val outputOptions: ImageCapture.OutputFileOptions = ImageCapture.OutputFileOptions
             .Builder(
                 requireContext().contentResolver,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                MediaStore.Images.Media.INTERNAL_CONTENT_URI,
                 contentValues
             )
             .build()
@@ -275,15 +279,35 @@ class PhotoFragment : Fragment(R.layout.fragment_take_photo) {
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+
+//                    val filePhoto = createPhotoFile() ?: return
+                    if (File(output.savedUri?.path).delete()) {
+                        Log.i("happy", "make delete photo")
+                    }
                     publishResults(KEY_ARGS_SAVE_URI, output.savedUri)
                     findNavController().popBackStack()
-//                    val msg = "Photo capture succeeded: ${output.savedUri}"
-//                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-//                    Log.d(TAG, msg)
-                    //cameraProvider?.unbindAll()
                 }
             }
         )
+    }
+
+    private fun createPhotoFile() : File? {
+        val storageDir = requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return  try {
+            // Create an image file name
+            val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+            return File.createTempFile(
+                "JPEG_${timeStamp}_", /* prefix */
+                ".jpg", /* suffix */
+                storageDir /* directory */
+            ).apply {
+                // Save a file: path for use with ACTION_VIEW intents
+//                currentPhotoPath = absolutePath
+//                binding.textView.text = currentPhotoPath
+            }
+        } catch (ex: IOException) {
+            null
+        }
     }
 
     companion object {

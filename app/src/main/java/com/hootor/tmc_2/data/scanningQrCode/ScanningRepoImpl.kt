@@ -2,6 +2,8 @@ package com.hootor.tmc_2.data.scanningQrCode
 
 import android.app.Application
 import android.net.Uri
+import android.util.Log
+import androidx.core.net.toFile
 import com.hootor.tmc_2.data.media.MediaHelper
 import com.hootor.tmc_2.domain.exception.Failure
 import com.hootor.tmc_2.domain.functional.Either
@@ -56,7 +58,11 @@ class ScanningRepoImpl @Inject constructor(
     ): Flow<Either<Failure, Boolean>> =
         flow {
 
-            val file = File(MediaHelper.getPath(application, uri))
+//            val file = File(MediaHelper.getPath(application, uri))
+            val file = uri.toFile()
+//            if(!File(uri.path).delete()) {
+//                Log.d("happy", "!file.delete() - sendImageFlow")
+//            }
 
             val requestFile =
                 file.asRequestBody(application.contentResolver.getType(uri)?.toMediaTypeOrNull())
@@ -66,6 +72,10 @@ class ScanningRepoImpl @Inject constructor(
             emit(request.make(tmcService.sendImageFile(body)) {
                 it.result ?: false
             })
+
+            if(!file.delete()) {
+                Log.d("happy", "!file.delete() - sendImageFlow")
+            }
         }
 
     override fun fetchPhoto(qrCode: String): Either<Failure, List<TMCSliderItem>> {

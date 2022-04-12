@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/docs_menu_graph"
+    app:startDestination="@id/menuDocsFragment">
+
+    <fragment
+        android:id="@+id/menuDocsFragment"
+        android:name="com.hootor.tmc_2.screens.main.tabs.MenuDocsFragment"
+        android:label="fragment_menu_docs"
+        tools:layout="@layout/fragment_menu_docs" />
+</navigation>

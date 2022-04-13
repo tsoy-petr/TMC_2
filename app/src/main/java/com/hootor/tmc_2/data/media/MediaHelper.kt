@@ -13,13 +13,23 @@ import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Base64
+import androidx.camera.core.ImageProxy
 import java.io.*
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 import androidx.exifinterface.media.ExifInterface
+import java.nio.ByteBuffer
 
 object MediaHelper {
+
+    fun imageProxyToBitmap(image: ImageProxy): Bitmap {
+        val planeProxy = image.planes[0]
+        val buffer: ByteBuffer = planeProxy.buffer
+        val bytes = ByteArray(buffer.remaining())
+        buffer.get(bytes)
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+    }
 
     fun decodeBitmap(uri: Uri, context: Context): Bitmap? {
         val IMG_MAX_SIDE_SIZE = 2000

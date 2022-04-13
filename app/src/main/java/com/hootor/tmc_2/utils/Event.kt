@@ -3,14 +3,21 @@ package com.hootor.tmc_2.utils
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import java.util.concurrent.atomic.AtomicBoolean
 
 class Event<T>(
     value: T
 ) {
 
+    private val isReading = AtomicBoolean(false)
     private var _value: T? = value
 
-    fun get(): T? = _value.also { _value = null }
+//    fun get(): T? = _value.also { _value = null }
+    fun get() : T? {
+        return if(isReading.compareAndSet(false, true)) {
+            return _value
+        } else null
+    }
 
 }
 

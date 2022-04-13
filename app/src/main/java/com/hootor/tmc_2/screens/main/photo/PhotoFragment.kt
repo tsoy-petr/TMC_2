@@ -1,6 +1,7 @@
 package com.hootor.tmc_2.screens.main.photo
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -18,19 +19,19 @@ import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.hootor.tmc_2.R
+import com.hootor.tmc_2.data.media.MediaHelper
+import com.hootor.tmc_2.data.media.YUVtoRGB
 import com.hootor.tmc_2.databinding.FragmentTakePhotoBinding
 import com.hootor.tmc_2.utils.Event
 import com.hootor.tmc_2.utils.FileUtil
 import com.hootor.tmc_2.utils.publishResults
+import com.hootor.tmc_2.utils.savePhotoToInternalStorage
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -41,7 +42,9 @@ import java.util.concurrent.Executors
 
 class PhotoFragment : Fragment(R.layout.fragment_take_photo) {
 
-    private lateinit var binding: FragmentTakePhotoBinding
+    private var _binding: FragmentTakePhotoBinding? = null
+    private val binding get() = _binding!!
+
     private var imageCapture: ImageCapture? = null
     private lateinit var cameraExecutor: ExecutorService
     private var orientationEventListener: OrientationEventListener? = null
@@ -88,7 +91,7 @@ class PhotoFragment : Fragment(R.layout.fragment_take_photo) {
         savedInstanceState: Bundle?,
     ): View {
 
-        binding = FragmentTakePhotoBinding.inflate(inflater, container, false)
+        _binding = FragmentTakePhotoBinding.inflate(inflater, container, false)
         binding.takePhoto.setOnClickListener {
             takePhoto()
             val animation: Animation =
@@ -97,40 +100,56 @@ class PhotoFragment : Fragment(R.layout.fragment_take_photo) {
             binding.takePhoto.startAnimation(animation)
         }
 
-
+        iniOrientationListenerForCamera()
 
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        iniOrientationListenerForCamera()
+    override fun onResume() {
+        super.onResume()
     }
 
     private fun iniOrientationListenerForCamera() {
+
+        //        val rotation = binding.viewFinder.display.rotation
+//        val isLandscape = rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270
+
+        imageCapture = ImageCapture.Builder()
+            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+//            .setTargetResolution(if (isLandscape) Size(1920, 1080) else Size(1080, 1920))
+//            .setTargetRotation(rotation)
+            .build()
+
         orientationEventListener = object : OrientationEventListener(requireContext()) {
             override fun onOrientationChanged(orientation: Int) {
-                imageCapture?.targetRotation = getOrientationFromDegrees(orientation)
+                // Monitors orientation values to determine the target rotation value
+                val rotation : Int = when (orientation) {
+                    in 45..134 -> Surface.ROTATION_270
+                    in 135..224 -> Surface.ROTATION_180
+                    in 225..314 -> Surface.ROTATION_90
+                    else -> Surface.ROTATION_0
+                }
+
+                imageCapture?.targetRotation = rotation
+//                imageCapture?.targetRotation = getOrientationFromDegrees(orientation)
+//                Log.i("happy onOrientationChanged", "orientation = ${orientation}")
+//                Log.i("happy onOrientationChanged", "onOrientationChanged = ${imageCapture?.targetRotation}")
             }
         }.apply {
             enable()
         }
 
-        val rotation = binding.viewFinder.display.rotation
-        val isLandscape = rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270
 
-        imageCapture = ImageCapture.Builder()
-            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-            .setTargetResolution(if (isLandscape) Size(1920, 1080) else Size(1080, 1920))
-            .setTargetRotation(rotation)
-            .build()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         cameraExecutor.shutdown()
         animationListener = null
+        orientationEventListener?.disable()
+        orientationEventListener?.canDetectOrientation()
         orientationEventListener = null
+        _binding = null
     }
 
     private fun getOrientationFromDegrees(orientation: Int): Int {
@@ -153,6 +172,18 @@ class PhotoFragment : Fragment(R.layout.fragment_take_photo) {
                 Surface.ROTATION_90
             }
         }
+
+//        if (orientation <= 45) {
+//            return Surface.ROTATION_0;
+//        } else if (orientation <= 135) {
+//            return Surface.ROTATION_90;
+//        } else if (orientation <= 225) {
+//            return Surface.ROTATION_180;
+//        } else if (orientation <= 315) {
+//            return Surface.ROTATION_270;
+//        }
+//        return Surface.ROTATION_0;
+
     }
 
     private fun startCamera() {
@@ -246,68 +277,71 @@ class PhotoFragment : Fragment(R.layout.fragment_take_photo) {
         // Get a stable reference of the modifiable image capture use case
         val imageCapture = imageCapture ?: return
 
+                val rotation = binding.viewFinder.display.rotation
+//        val isLandscape = rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270
+
+        imageCapture.targetRotation = rotation
+
 //
 
-        // Create time stamped name and MediaStore entry.
-        val name = FileUtil.getFileName()
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
-            }
-        }
+//        // Create time stamped name and MediaStore entry.
+//        val name = FileUtil.getFileName()
+//        val contentValues = ContentValues().apply {
+//            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+//            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+//            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+//                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
+//            }
+//        }
 
-        // Create output options object which contains file + metadata
-        val outputOptions: ImageCapture.OutputFileOptions = ImageCapture.OutputFileOptions
-            .Builder(
-                requireContext().contentResolver,
-                MediaStore.Images.Media.INTERNAL_CONTENT_URI,
-                contentValues
-            )
-            .build()
+//        // Create output options object which contains file + metadata
+//        val outputOptions: ImageCapture.OutputFileOptions = ImageCapture.OutputFileOptions
+//            .Builder(
+//                requireContext().contentResolver,
+//                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+//                contentValues
+//            )
+//            .build()
 
         // Set up image capture listener, which is triggered after photo has
         // been taken
-        imageCapture.takePicture(
-            outputOptions,
-            ContextCompat.getMainExecutor(requireContext()),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onError(exc: ImageCaptureException) {
-                    findNavController().popBackStack()
-                    Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
-                }
+//        imageCapture.takePicture(
+//            outputOptions,
+//            ContextCompat.getMainExecutor(requireContext()),
+//            object : ImageCapture.OnImageSavedCallback {
+//                override fun onError(exc: ImageCaptureException) {
+//                    findNavController().popBackStack()
+//                    Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
+//                }
+//
+//                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+//                    publishResults(KEY_ARGS_SAVE_URI, output.savedUri)
+//                    findNavController().popBackStack()
+//                }
+//            }
+//        )
+        imageCapture.takePicture(ContextCompat.getMainExecutor(requireContext()),
+        object : ImageCapture.OnImageCapturedCallback(){
+            @SuppressLint("UnsafeOptInUsageError")
+            override fun onCaptureSuccess(image: ImageProxy) {
+                super.onCaptureSuccess(image)
 
-                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                Log.i("happy targetRotation", "targetRotation = " + imageCapture.targetRotation.toString())
 
-//                    val filePhoto = createPhotoFile() ?: return
-                    if (File(output.savedUri?.path).delete()) {
-                        Log.i("happy", "make delete photo")
-                    }
-                    publishResults(KEY_ARGS_SAVE_URI, output.savedUri)
-                    findNavController().popBackStack()
-                }
+//                val bitmap = MediaHelper.imageProxyToBitmap(image)
+                val bitmap = YUVtoRGB().translateYUV(image.image, requireContext())
+                val uri = savePhotoToInternalStorage(UUID.randomUUID().toString(), bitmap)
+                image.close()
+                publishResults(KEY_ARGS_SAVE_URI, uri)
+                findNavController().popBackStack()
             }
-        )
-    }
 
-    private fun createPhotoFile() : File? {
-        val storageDir = requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return  try {
-            // Create an image file name
-            val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-            return File.createTempFile(
-                "JPEG_${timeStamp}_", /* prefix */
-                ".jpg", /* suffix */
-                storageDir /* directory */
-            ).apply {
-                // Save a file: path for use with ACTION_VIEW intents
-//                currentPhotoPath = absolutePath
-//                binding.textView.text = currentPhotoPath
+            override fun onError(exception: ImageCaptureException) {
+                super.onError(exception)
+//                findNavController().popBackStack()
+                exception.printStackTrace()
             }
-        } catch (ex: IOException) {
-            null
-        }
+        })
     }
 
     companion object {

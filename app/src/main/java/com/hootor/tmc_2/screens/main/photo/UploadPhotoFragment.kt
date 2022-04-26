@@ -19,7 +19,6 @@ import com.hootor.tmc_2.databinding.FragmentUploadPhotoBinding
 import com.hootor.tmc_2.di.ViewModelFactory
 import com.hootor.tmc_2.screens.main.photo.State.*
 import com.hootor.tmc_2.utils.publishResults
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

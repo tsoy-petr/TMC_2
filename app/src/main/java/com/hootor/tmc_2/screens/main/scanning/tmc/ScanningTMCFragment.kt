@@ -97,17 +97,17 @@ class ScanningTMCFragment : Fragment(R.layout.fragment_scanning) {
         ::onGotCameraPermissionResult
     )
 
-    val takePhotoFromPreview = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { imgBitmap: Bitmap ->
-
-        findTopNavController().navigate(
-            R.id.action_tabsFragment_to_upload_photo_graph,
-            bundleOf(
-                KEY_ARGS_URI_IMAGE to savePhotoToInternalStorage(UUID.randomUUID().toString(), imgBitmap),
-                UploadPhotoFragment.KEY_ARGS_QR_CODE to viewModel.getCurrQrCode()
-            )
-        )
-
-    }
+//    val takePhotoFromPreview = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { imgBitmap: Bitmap ->
+//
+//        findTopNavController().navigate(
+//            R.id.action_tabsFragment_to_upload_photo_graph,
+//            bundleOf(
+//                KEY_ARGS_URI_IMAGE to savePhotoToInternalStorage(UUID.randomUUID().toString(), imgBitmap),
+//                UploadPhotoFragment.KEY_ARGS_QR_CODE to viewModel.getCurrQrCode()
+//            )
+//        )
+//
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

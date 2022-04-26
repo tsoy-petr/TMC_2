@@ -3,11 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/take_photo_graph"
-    app:startDestination="@id/photoFragment">
+    app:startDestination="@id/cameraFragment">
 
     <fragment
-        android:id="@+id/photoFragment"
-        android:name="com.hootor.tmc_2.screens.main.photo.PhotoFragment"
-        android:label="fragment_take_photo"
-        tools:layout="@layout/fragment_take_photo" />
+        android:id="@+id/cameraFragment"
+        android:name="com.hootor.tmc_2.screens.main.photo.CameraFragment"
+        android:label="fragment_camera"
+        tools:layout="@layout/fragment_camera" />
+
+
 </navigation>

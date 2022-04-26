@@ -10,4 +10,9 @@
 
     <color name="md_deep_orange_300">#FF8A65</color>
     <color name="md_deep_orange_900">#BF360C</color>
+
+    <color name="icActive">#FFFFFFFF</color>
+    <color name="icFocused">#DDFFFFFF</color>
+    <color name="icPressed">#AAFFFFFF</color>
+
 </resources>
